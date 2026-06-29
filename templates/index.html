@@ -39,9 +39,15 @@
 
         <div class="response">
 
-            <h3>Response</h3>
+            <img src="{{ response.image }}" alt="Pokemon Image">
 
-            <p>{{ response }}</p>
+            <h2>{{ response.name.title() }}</h2>
+
+            <p><strong>Type:</strong> {{ response.type.title() }}</p>
+
+            <p><strong>Height:</strong> {{ response.height }}</p>
+
+            <p><strong>Weight:</strong> {{ response.weight }}</p>
 
         </div>
 

@@ -28,7 +28,7 @@ h1{
 
     font-size:60px;
 
-    color:#00d4ff;
+    color:#bbff00;
 
     margin-bottom:10px;
 
@@ -76,7 +76,7 @@ button{
 
     border-radius:8px;
 
-    background:#00d4ff;
+    background:#bbff00;
 
     color:black;
 
@@ -88,7 +88,7 @@ button{
 
 button:hover{
 
-    background:#33ddff;
+    background:#bbff00;
 
 }
 
@@ -110,6 +110,6 @@ button:hover{
 
     margin-bottom:10px;
 
-    color:#00d4ff;
+    color:#bbff00;
 
 }
