@@ -37,19 +37,31 @@
 
         {% if response %}
 
-        <div class="response">
+            {% if response.image %}
 
-            <img src="{{ response.image }}" alt="Pokemon Image">
+            <div class="response">
 
-            <h2>{{ response.name.title() }}</h2>
+                <img src="{{ response.image }}" alt="Pokemon Image">
 
-            <p><strong>Type:</strong> {{ response.type.title() }}</p>
+                <h2>{{ response.name.title() }}</h2>
 
-            <p><strong>Height:</strong> {{ response.height }}</p>
+                <p><strong>Type:</strong> {{ response.type.title() }}</p>
 
-            <p><strong>Weight:</strong> {{ response.weight }}</p>
+                <p><strong>Height:</strong> {{ response.height }}</p>
 
-        </div>
+                <p><strong>Weight:</strong> {{ response.weight }}</p>
+
+            </div>
+
+            {% else %}
+
+            <div class="response">
+
+                <p>{{ response }}</p>
+
+            </div>
+
+            {% endif %}
 
         {% endif %}
 
