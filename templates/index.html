@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cloudizard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Cloudizard</h1>
+
+        <p>Your AI Router powered by Gemini, Weather API and PokéAPI</p>
+
+        <form method="POST">
+
+            <input
+                type="text"
+                name="query"
+                placeholder="Ask me anything..."
+                required
+            >
+
+            <button type="submit">
+                Ask
+            </button>
+
+        </form>
+
+        {% if response %}
+
+        <div class="response">
+
+            <h3>Response</h3>
+
+            <p>{{ response }}</p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
