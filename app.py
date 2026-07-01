@@ -39,7 +39,7 @@ def get_pokemon(pokemon_name):
 
 def route_query(query):
 
-    prompt = f"""You are a routing assistant. Given the user query below, decide what to do.
+    prompt = f"""You are a routing assistant. From the given user query given below, decide what to do.
 
 If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
 If the query is about weather, reply with exactly: WEATHER
@@ -74,7 +74,6 @@ def home():
         "index.html",
         response=response
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
