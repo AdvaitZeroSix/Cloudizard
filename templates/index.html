@@ -64,23 +64,47 @@
 
             <section class="response response-pokemon">
 
-                <p class="response-label">creature found</p>
+                <p class="response-label">creature #{{ '%03d'|format(response.id) }}</p>
 
-                <img src="{{ response.image }}" alt="{{ response.name }} sprite" class="pokemon-sprite">
+                <img src="{{ response.image }}" alt="{{ response.name }} artwork" class="pokemon-sprite">
 
                 <h2>{{ response.name.title() }}</h2>
 
-                <span class="type-badge">{{ response.type.title() }}</span>
+                <div class="type-badges">
+                    {% for t in response.types %}
+                    <span class="type-badge type-{{ t }}">{{ t }}</span>
+                    {% endfor %}
+                </div>
 
                 <div class="stat-row">
                     <div class="stat">
-                        <span class="stat-value">{{ response.height }}</span>
+                        <span class="stat-value">{{ "%.1f"|format(response.height) }} m</span>
                         <span class="stat-label">height</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-value">{{ response.weight }}</span>
+                        <span class="stat-value">{{ "%.1f"|format(response.weight) }} kg</span>
                         <span class="stat-label">weight</span>
                     </div>
+                </div>
+
+                <p class="section-heading">Abilities</p>
+                <div class="chip-row">
+                    {% for a in response.abilities %}
+                    <span class="chip">{{ a.title() }}</span>
+                    {% endfor %}
+                </div>
+
+                <p class="section-heading">Base stats</p>
+                <div class="bar-stats">
+                    {% for name, value in response.stats.items() %}
+                    <div class="bar-stat">
+                        <span class="bar-label">{{ name.title() }}</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ (value / 180 * 100) if value < 180 else 100 }}%"></div>
+                        </div>
+                        <span class="bar-value">{{ value }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
 
             </section>
@@ -100,6 +124,7 @@
                 </div>
 
                 <p class="temp">{{ response.temp }}°<span class="unit">C</span></p>
+                <p class="temp-range">H: {{ response.temp_max }}° &nbsp;L: {{ response.temp_min }}°</p>
 
                 <div class="stat-row">
                     <div class="stat">
@@ -113,6 +138,21 @@
                     <div class="stat">
                         <span class="stat-value">{{ response.wind_speed }} m/s</span>
                         <span class="stat-label">wind</span>
+                    </div>
+                </div>
+
+                <div class="stat-row stat-row-secondary">
+                    <div class="stat">
+                        <span class="stat-value">{{ response.pressure }} hPa</span>
+                        <span class="stat-label">pressure</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ response.visibility_km }} km</span>
+                        <span class="stat-label">visibility</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ response.sunrise }} / {{ response.sunset }}</span>
+                        <span class="stat-label">sunrise / sunset</span>
                     </div>
                 </div>
 

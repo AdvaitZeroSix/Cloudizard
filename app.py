@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone, timedelta
 import google.generativeai as genai
 from dotenv import load_dotenv
 import requests
@@ -34,15 +35,27 @@ def get_weather(city):
 
     data = response.json()
 
+    # Convert sunrise/sunset (unix UTC) into the city's local time using its UTC offset
+    tz_offset = data.get("timezone", 0)  # seconds
+    tz = timezone(timedelta(seconds=tz_offset))
+    sunrise = datetime.fromtimestamp(data["sys"]["sunrise"], tz=tz).strftime("%I:%M %p")
+    sunset = datetime.fromtimestamp(data["sys"]["sunset"], tz=tz).strftime("%I:%M %p")
+
     return {
         "city": data["name"],
         "country": data["sys"]["country"],
         "temp": round(data["main"]["temp"]),
         "feels_like": round(data["main"]["feels_like"]),
+        "temp_min": round(data["main"]["temp_min"]),
+        "temp_max": round(data["main"]["temp_max"]),
         "description": data["weather"][0]["description"],
         "icon": data["weather"][0]["icon"],
         "humidity": data["main"]["humidity"],
-        "wind_speed": data["wind"]["speed"]
+        "pressure": data["main"]["pressure"],
+        "wind_speed": data["wind"]["speed"],
+        "visibility_km": round(data.get("visibility", 0) / 1000, 1),
+        "sunrise": sunrise,
+        "sunset": sunset
     }
 
 
@@ -58,18 +71,34 @@ def get_pokemon(pokemon_name):
         return f"Sorry, I couldn't find a Pokémon named '{pokemon_name}'."
 
     data = response.json()
-    name = data["name"]
-    height = data["height"]
-    weight = data["weight"]
-    image = data["sprites"]["front_default"]
-    pokemon_type = data["types"][0]["type"]["name"]
+
+    # PokéAPI returns height in decimetres and weight in hectograms - convert to metres/kg
+    height_m = data["height"] / 10
+    weight_kg = data["weight"] / 10
+
+    types = [t["type"]["name"] for t in data["types"]]
+    abilities = [a["ability"]["name"].replace("-", " ") for a in data["abilities"]]
+
+    stats = {}
+    for s in data["stats"]:
+        stat_name = s["stat"]["name"].replace("-", " ")
+        stats[stat_name] = s["base_stat"]
+
+    image = (
+        data["sprites"]["other"]["official-artwork"]["front_default"]
+        or data["sprites"]["front_default"]
+    )
 
     return {
-        "name": name,
-        "height": height,
-        "weight": weight,
+        "name": data["name"],
+        "id": data["id"],
+        "height": height_m,
+        "weight": weight_kg,
         "image": image,
-        "type": pokemon_type
+        "type": types[0],
+        "types": types,
+        "abilities": abilities,
+        "stats": stats
     }
 
 

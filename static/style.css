@@ -326,3 +326,108 @@ button:focus-visible {
     .weather-main { flex-direction: column; text-align: center; }
     .stat-row { gap: 20px; }
 }
+
+/* --- Extended Pokémon info --- */
+
+.type-badges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.type-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(111, 227, 180, 0.3);
+    color: var(--accent-green);
+    background: rgba(111, 227, 180, 0.12);
+}
+
+.section-heading {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    margin: 24px 0 10px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.chip {
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.bar-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-stat {
+    display: grid;
+    grid-template-columns: 90px 1fr 32px;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: left;
+}
+
+.bar-track {
+    height: 6px;
+    background: var(--surface-raised);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+    border-radius: 999px;
+}
+
+.bar-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    text-align: right;
+}
+
+/* --- Extended weather info --- */
+
+.temp-range {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: -16px;
+    margin-bottom: 20px;
+}
+
+.stat-row-secondary {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
