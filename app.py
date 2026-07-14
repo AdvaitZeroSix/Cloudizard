@@ -17,7 +17,7 @@ load_dotenv()
 genai.configure(
     api_key=os.getenv("GEMINI_API_KEY")
 )
-model = genai.GenerativeModel("gemini-2.5-flash-lite")
+model = genai.GenerativeModel("gemini-3.1-flash-lite")
 
 
 def get_weather(city):
