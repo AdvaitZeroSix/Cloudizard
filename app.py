@@ -1,9 +1,14 @@
 import os
+import logging
 from datetime import datetime, timezone, timedelta
 import google.generativeai as genai
+from google.api_core.exceptions import ResourceExhausted
 from dotenv import load_dotenv
 import requests
 from flask import Flask, render_template, request
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -116,8 +121,12 @@ User query: {query}"""
 
     try:
         response = model.generate_content(prompt)
-    except Exception:
+    except ResourceExhausted:
+        logger.warning("Gemini rate limit hit (ResourceExhausted).")
         return "Cloudizard is getting a lot of questions right now — please wait a few seconds and try again."
+    except Exception as e:
+        logger.error(f"Gemini call failed: {type(e).__name__}: {e}")
+        return "Something went wrong talking to Gemini. Please try again in a moment."
 
     result = response.text.strip()
 
