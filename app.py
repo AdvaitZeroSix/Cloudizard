@@ -18,7 +18,11 @@ def get_weather(city):
     api_key = os.getenv("WEATHER_API_KEY")
 
     url = "https://api.openweathermap.org/data/2.5/weather"
-    params = {"q": city, "appid": api_key, "units": "metric"}
+    params = {
+        "q": city,
+        "appid": api_key,
+        "units": "metric"
+    }
 
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -29,6 +33,7 @@ def get_weather(city):
         return f"Sorry, I couldn't find weather for '{city}'. Try a different city name."
 
     data = response.json()
+
     return {
         "city": data["name"],
         "country": data["sys"]["country"],
@@ -70,16 +75,20 @@ def get_pokemon(pokemon_name):
 
 def route_query(query):
 
+    # Single Gemini call handles both routing AND extraction (city / pokemon name)
+    # to stay well under the free-tier rate limit (5 requests/minute).
     prompt = f"""You are a routing assistant. From the user query below, decide what to do.
-            If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
-            If the query is about weather, reply with exactly: WEATHER <city_name>
-            Otherwise, just answer the question directly in plain text.
-            User query: {query}"""
+
+If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
+If the query is about weather, reply with exactly: WEATHER <city_name>
+Otherwise, just answer the question directly in plain text.
+
+User query: {query}"""
 
     try:
         response = model.generate_content(prompt)
-    except Exception as e:
-        return "I'm getting a lot of requests right now — please wait a few seconds and try again."
+    except Exception:
+        return "Cloudizard is getting a lot of questions right now — please wait a few seconds and try again."
 
     result = response.text.strip()
 
@@ -99,14 +108,16 @@ def route_query(query):
 def home():
 
     response = ""
+    query = ""
 
     if request.method == "POST":
-        user_query = request.form["query"]
-        response = route_query(user_query)
+        query = request.form["query"]
+        response = route_query(query)
 
     return render_template(
         "index.html",
-        response=response
+        response=response,
+        query=query
     )
 
 

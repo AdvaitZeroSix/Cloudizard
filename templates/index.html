@@ -8,6 +8,10 @@
 
     <title>Cloudizard</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
@@ -16,16 +20,35 @@
 
     <div class="container">
 
-        <h1>Cloudizard</h1>
+        <header class="hero">
 
-        <p>Your AI Router powered by Gemini, Weather API and PokéAPI</p>
+            <div class="orb" aria-hidden="true">
+                <div class="orb-glow"></div>
+                <div class="orb-core"></div>
+            </div>
 
-        <form method="POST">
+            <p class="eyebrow">ask the orb</p>
+
+            <h1>Cloudizard</h1>
+
+            <p class="subtitle">One question. The orb decides whether to check the sky, the Pokédex, or just answer you directly.</p>
+
+            <ul class="sources">
+                <li><span class="dot dot-gemini"></span>Gemini routes your question</li>
+                <li><span class="dot dot-weather"></span>OpenWeatherMap for climate</li>
+                <li><span class="dot dot-pokemon"></span>PokéAPI for creatures</li>
+            </ul>
+
+        </header>
+
+        <form method="POST" class="query-form">
 
             <input
                 type="text"
                 name="query"
-                placeholder="Ask me anything..."
+                value="{{ query }}"
+                placeholder="Try 'weather in Kyoto' or 'tell me about charizard'..."
+                autocomplete="off"
                 required
             >
 
@@ -39,47 +62,71 @@
 
             {% if response.image %}
 
-            <div class="response">
+            <section class="response response-pokemon">
 
-                <img src="{{ response.image }}" alt="Pokemon Image">
+                <p class="response-label">creature found</p>
+
+                <img src="{{ response.image }}" alt="{{ response.name }} sprite" class="pokemon-sprite">
 
                 <h2>{{ response.name.title() }}</h2>
 
-                <p><strong>Type:</strong> {{ response.type.title() }}</p>
+                <span class="type-badge">{{ response.type.title() }}</span>
 
-                <p><strong>Height:</strong> {{ response.height }}</p>
+                <div class="stat-row">
+                    <div class="stat">
+                        <span class="stat-value">{{ response.height }}</span>
+                        <span class="stat-label">height</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ response.weight }}</span>
+                        <span class="stat-label">weight</span>
+                    </div>
+                </div>
 
-                <p><strong>Weight:</strong> {{ response.weight }}</p>
-
-            </div>
+            </section>
 
             {% elif response.city %}
 
-            <div class="response weather-response">
+            <section class="response response-weather">
 
-                <img src="https://openweathermap.org/img/wn/{{ response.icon }}@2x.png" alt="Weather icon">
+                <p class="response-label">forecast</p>
 
-                <h2>{{ response.city }}, {{ response.country }}</h2>
+                <div class="weather-main">
+                    <img src="https://openweathermap.org/img/wn/{{ response.icon }}@2x.png" alt="{{ response.description }}">
+                    <div>
+                        <h2>{{ response.city }}, {{ response.country }}</h2>
+                        <p class="condition">{{ response.description.title() }}</p>
+                    </div>
+                </div>
 
-                <p class="temp">{{ response.temp }}°C</p>
+                <p class="temp">{{ response.temp }}°<span class="unit">C</span></p>
 
-                <p><strong>Feels like:</strong> {{ response.feels_like }}°C</p>
+                <div class="stat-row">
+                    <div class="stat">
+                        <span class="stat-value">{{ response.feels_like }}°C</span>
+                        <span class="stat-label">feels like</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ response.humidity }}%</span>
+                        <span class="stat-label">humidity</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ response.wind_speed }} m/s</span>
+                        <span class="stat-label">wind</span>
+                    </div>
+                </div>
 
-                <p><strong>Condition:</strong> {{ response.description.title() }}</p>
-
-                <p><strong>Humidity:</strong> {{ response.humidity }}%</p>
-
-                <p><strong>Wind speed:</strong> {{ response.wind_speed }} m/s</p>
-
-            </div>
+            </section>
 
             {% else %}
 
-            <div class="response">
+            <section class="response response-text">
 
-                <p>{{ response }}</p>
+                <p class="response-label">the orb says</p>
 
-            </div>
+                <p class="text-answer">{{ response }}</p>
+
+            </section>
 
             {% endif %}
 
