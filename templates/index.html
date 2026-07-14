@@ -53,6 +53,26 @@
 
             </div>
 
+            {% elif response.city %}
+
+            <div class="response weather-response">
+
+                <img src="https://openweathermap.org/img/wn/{{ response.icon }}@2x.png" alt="Weather icon">
+
+                <h2>{{ response.city }}, {{ response.country }}</h2>
+
+                <p class="temp">{{ response.temp }}°C</p>
+
+                <p><strong>Feels like:</strong> {{ response.feels_like }}°C</p>
+
+                <p><strong>Condition:</strong> {{ response.description.title() }}</p>
+
+                <p><strong>Humidity:</strong> {{ response.humidity }}%</p>
+
+                <p><strong>Wind speed:</strong> {{ response.wind_speed }} m/s</p>
+
+            </div>
+
             {% else %}
 
             <div class="response">

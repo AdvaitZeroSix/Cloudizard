@@ -106,10 +106,36 @@ button:hover{
 
 }
 
-.response h3{
+.response h2{
 
     margin-bottom:10px;
 
     color:#bbff00;
+
+}
+
+.response img{
+
+    display:block;
+
+    margin:0 auto 15px;
+
+}
+
+.weather-response{
+
+    text-align:center;
+
+}
+
+.weather-response .temp{
+
+    font-size:48px;
+
+    font-weight:bold;
+
+    color:#bbff00;
+
+    margin-bottom:10px;
 
 }

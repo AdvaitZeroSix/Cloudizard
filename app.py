@@ -14,13 +14,44 @@ genai.configure(
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
-def get_weather(query):
-    return "Weather API will be called here."
+def get_weather(city):
+    api_key = os.getenv("WEATHER_API_KEY")
+
+    url = "https://api.openweathermap.org/data/2.5/weather"
+    params = {"q": city, "appid": api_key, "units": "metric"}
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+    except requests.exceptions.RequestException:
+        return "Sorry, I couldn't reach the weather service right now."
+
+    if response.status_code != 200:
+        return f"Sorry, I couldn't find weather for '{city}'. Try a different city name."
+
+    data = response.json()
+    return {
+        "city": data["name"],
+        "country": data["sys"]["country"],
+        "temp": round(data["main"]["temp"]),
+        "feels_like": round(data["main"]["feels_like"]),
+        "description": data["weather"][0]["description"],
+        "icon": data["weather"][0]["icon"],
+        "humidity": data["main"]["humidity"],
+        "wind_speed": data["wind"]["speed"]
+    }
 
 
 def get_pokemon(pokemon_name):
     url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}"
-    response = requests.get(url)
+
+    try:
+        response = requests.get(url, timeout=10)
+    except requests.exceptions.RequestException:
+        return "Sorry, I couldn't reach the Pokémon service right now."
+
+    if response.status_code != 200:
+        return f"Sorry, I couldn't find a Pokémon named '{pokemon_name}'."
+
     data = response.json()
     name = data["name"]
     height = data["height"]
@@ -39,15 +70,17 @@ def get_pokemon(pokemon_name):
 
 def route_query(query):
 
-    prompt = f"""You are a routing assistant. From the given user query given below, decide what to do.
+    prompt = f"""You are a routing assistant. From the user query below, decide what to do.
+            If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
+            If the query is about weather, reply with exactly: WEATHER <city_name>
+            Otherwise, just answer the question directly in plain text.
+            User query: {query}"""
 
-If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
-If the query is about weather, reply with exactly: WEATHER
-Otherwise, just answer the question directly in plain text.
+    try:
+        response = model.generate_content(prompt)
+    except Exception as e:
+        return "I'm getting a lot of requests right now — please wait a few seconds and try again."
 
-User query: {query}"""
-
-    response = model.generate_content(prompt)
     result = response.text.strip()
 
     if result.startswith("POKEMON"):
@@ -55,7 +88,8 @@ User query: {query}"""
         return get_pokemon(pokemon_name)
 
     elif result.startswith("WEATHER"):
-        return get_weather(query)
+        city = result.split(" ", 1)[1].strip()
+        return get_weather(city)
 
     else:
         return result
@@ -74,6 +108,7 @@ def home():
         "index.html",
         response=response
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
