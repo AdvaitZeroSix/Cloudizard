@@ -40,7 +40,6 @@ def get_weather(city):
 
     data = response.json()
 
-    # Convert sunrise/sunset (unix UTC) into the city's local time using its UTC offset
     tz_offset = data.get("timezone", 0)  # seconds
     tz = timezone(timedelta(seconds=tz_offset))
     sunrise = datetime.fromtimestamp(data["sys"]["sunrise"], tz=tz).strftime("%I:%M %p")
@@ -157,7 +156,6 @@ def home():
         response=response,
         query=query
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
