@@ -32,7 +32,6 @@ body {
     padding: 64px 0 80px;
 }
 
-/* --- Hero --- */
 
 .hero {
     text-align: center;
@@ -127,7 +126,6 @@ h1 {
 .dot-weather { background: var(--accent-cyan); }
 .dot-pokemon { background: var(--accent-green); }
 
-/* --- Form --- */
 
 .query-form {
     display: flex;
@@ -178,6 +176,46 @@ button:hover {
 button:focus-visible {
     outline: 2px solid var(--text);
     outline-offset: 2px;
+}
+
+
+.location-btn {
+    padding: 14px 20px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text);
+    font-weight: 500;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.location-btn:hover {
+    background: var(--surface-raised);
+    border-color: var(--text-muted);
+}
+
+.location-btn:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+.location-status {
+    margin-top: 10px;
+    min-height: 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.hidden {
+    display: none;
+}
+
+.response-pinned {
+    border-left: 3px solid var(--accent-cyan);
 }
 
 /* --- Response --- */
@@ -317,17 +355,15 @@ button:focus-visible {
     color: var(--text);
 }
 
-/* --- Responsive --- */
 
 @media (max-width: 480px) {
     h1 { font-size: 42px; }
     .query-form { flex-direction: column; }
     button { width: 100%; }
+    .location-btn { width: 100%; }
     .weather-main { flex-direction: column; text-align: center; }
     .stat-row { gap: 20px; }
 }
-
-/* --- Extended Pokémon info --- */
 
 .type-badges {
     display: flex;
@@ -415,9 +451,6 @@ button:focus-visible {
     color: var(--text);
     text-align: right;
 }
-
-/* --- Extended weather info --- */
-
 .temp-range {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;

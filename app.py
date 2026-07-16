@@ -5,7 +5,7 @@ import google.generativeai as genai
 from google.api_core.exceptions import ResourceExhausted
 from dotenv import load_dotenv
 import requests
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,15 +20,8 @@ genai.configure(
 model = genai.GenerativeModel("gemini-3.1-flash-lite")
 
 
-def get_weather(city):
-    api_key = os.getenv("WEATHER_API_KEY")
-
+def _fetch_weather(params, not_found_msg):
     url = "https://api.openweathermap.org/data/2.5/weather"
-    params = {
-        "q": city,
-        "appid": api_key,
-        "units": "metric"
-    }
 
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -36,11 +29,11 @@ def get_weather(city):
         return "Sorry, I couldn't reach the weather service right now."
 
     if response.status_code != 200:
-        return f"Sorry, I couldn't find weather for '{city}'. Try a different city name."
+        return not_found_msg
 
     data = response.json()
 
-    tz_offset = data.get("timezone", 0)  # seconds
+    tz_offset = data.get("timezone", 0)
     tz = timezone(timedelta(seconds=tz_offset))
     sunrise = datetime.fromtimestamp(data["sys"]["sunrise"], tz=tz).strftime("%I:%M %p")
     sunset = datetime.fromtimestamp(data["sys"]["sunset"], tz=tz).strftime("%I:%M %p")
@@ -63,6 +56,29 @@ def get_weather(city):
     }
 
 
+def get_weather(city):
+    api_key = os.getenv("WEATHER_API_KEY")
+    params = {
+        "q": city,
+        "appid": api_key,
+        "units": "metric"
+    }
+    not_found_msg = f"Sorry, I couldn't find weather for '{city}'. Try a different city name."
+    return _fetch_weather(params, not_found_msg)
+
+
+def get_weather_by_coords(lat, lon):
+    api_key = os.getenv("WEATHER_API_KEY")
+    params = {
+        "lat": lat,
+        "lon": lon,
+        "appid": api_key,
+        "units": "metric"
+    }
+    not_found_msg = "Sorry, I couldn't find weather for your location."
+    return _fetch_weather(params, not_found_msg)
+
+
 def get_pokemon(pokemon_name):
     url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}"
 
@@ -76,7 +92,6 @@ def get_pokemon(pokemon_name):
 
     data = response.json()
 
-    # PokéAPI returns height in decimetres and weight in hectograms - convert to metres/kg
     height_m = data["height"] / 10
     weight_kg = data["weight"] / 10
 
@@ -108,8 +123,6 @@ def get_pokemon(pokemon_name):
 
 def route_query(query):
 
-    # Single Gemini call handles both routing AND extraction (city / pokemon name)
-    # to stay well under the free-tier rate limit (5 requests/minute).
     prompt = f"""You are a routing assistant. From the user query below, decide what to do.
 
 If the query is about a Pokemon, reply with exactly: POKEMON <pokemon_name>
@@ -156,6 +169,24 @@ def home():
         response=response,
         query=query
     )
+
+
+@app.route("/location-weather", methods=["POST"])
+def location_weather():
+    data = request.get_json(silent=True) or {}
+    lat = data.get("lat")
+    lon = data.get("lon")
+
+    if lat is None or lon is None:
+        return jsonify({"error": "Missing coordinates."}), 400
+
+    result = get_weather_by_coords(lat, lon)
+
+    if isinstance(result, str):
+        return jsonify({"error": result}), 502
+
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
