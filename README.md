@@ -6,7 +6,7 @@ Note: the app is hosted on Render's free tier. If it hasn't been used in the las
 
 ## What it does
 
-Cloudizard is a Flask app with one text box. You type a question, and Gemini figures out what kind of question it is before deciding what to do with it:
+Cloudizard is a Flask app. You type a question, and Gemini figures out what kind of question it is before deciding what to do with it:
 
 - If it's about a Pokemon, it calls the PokeAPI and returns stats, types, and abilities.
 - If it's about weather, it pulls the city name out of your question and calls the OpenWeatherMap API for current conditions.
@@ -14,7 +14,7 @@ Cloudizard is a Flask app with one text box. You type a question, and Gemini fig
 
 ## How it works
 
-1. The query is sent to Gemini (`gemini-3.1-flash-lite`) with a routing prompt.
+1. The query is sent to Gemini with a routing prompt.
 2. Gemini responds with either `POKEMON <name>`, `WEATHER <city>`, or a plain text answer. The name or city is extracted in this same call, so there's no second API request.
 3. Based on that response, the app calls the matching API and renders the result.
 
