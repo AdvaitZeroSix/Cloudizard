@@ -28,8 +28,8 @@ Cloudizard is a Flask app. You type a question, and Gemini figures out what kind
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/<your-username>/cloudizard.git
-   cd cloudizard
+   git clone https://github.com/AdvaitZeroSix/Cloudizard.git
+   cd Cloudizard
    ```
 
 2. Set up a virtual environment and install dependencies:
@@ -50,12 +50,16 @@ Cloudizard is a Flask app. You type a question, and Gemini figures out what kind
    python app.py
    ```
 
-5. Open `http://127.0.0.1:5000` in a browser.
+5. Open `http://127.0.0.1:5000` in a browser. Set `FLASK_DEBUG=1` first if you want debug mode.
+
+## Limits
+
+Each query costs a Gemini call, so the app allows 10 questions per minute per visitor (and 20 location lookups per minute). Questions are cut off at 500 characters.
 
 ## Project structure
 
 ```
-cloudizard/
+Cloudizard/
     app.py
     requirements.txt
     README.md

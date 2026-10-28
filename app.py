@@ -1,16 +1,28 @@
 import os
 import logging
+from urllib.parse import quote
 from datetime import datetime, timezone, timedelta
 import google.generativeai as genai
 from google.api_core.exceptions import ResourceExhausted
 from dotenv import load_dotenv
 import requests
 from flask import Flask, render_template, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Render sits behind a proxy, so read the real client IP from X-Forwarded-For
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
+
+# Every query costs a Gemini call, so limit how fast one visitor can send them
+limiter = Limiter(get_remote_address, app=app, storage_uri="memory://")
+
+MAX_QUERY_LENGTH = 500
 
 load_dotenv()
 
@@ -80,7 +92,8 @@ def get_weather_by_coords(lat, lon):
 
 
 def get_pokemon(pokemon_name):
-    url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}"
+    # The name comes from the model, so encode it before putting it in the URL
+    url = f"https://pokeapi.co/api/v2/pokemon/{quote(pokemon_name.lower(), safe='')}"
 
     try:
         response = requests.get(url, timeout=10)
@@ -142,27 +155,31 @@ User query: {query}"""
 
     result = response.text.strip()
 
-    if result.startswith("POKEMON"):
-        pokemon_name = result.split(" ", 1)[1].strip()
-        return get_pokemon(pokemon_name)
+    # "POKEMON <name>" or "WEATHER <city>"; ignore the reply if the name is missing
+    parts = result.split(" ", 1)
 
-    elif result.startswith("WEATHER"):
-        city = result.split(" ", 1)[1].strip()
-        return get_weather(city)
+    if parts[0] == "POKEMON" and len(parts) == 2:
+        return get_pokemon(parts[1].strip())
+
+    elif parts[0] == "WEATHER" and len(parts) == 2:
+        return get_weather(parts[1].strip())
 
     else:
         return result
 
 
 @app.route("/", methods=["GET", "POST"])
+@limiter.limit("10 per minute", methods=["POST"])
 def home():
 
     response = ""
     query = ""
 
     if request.method == "POST":
-        query = request.form["query"]
-        response = route_query(query)
+        query = request.form.get("query", "").strip()[:MAX_QUERY_LENGTH]
+
+        if query:
+            response = route_query(query)
 
     return render_template(
         "index.html",
@@ -172,6 +189,7 @@ def home():
 
 
 @app.route("/location-weather", methods=["POST"])
+@limiter.limit("20 per minute")
 def location_weather():
     data = request.get_json(silent=True) or {}
     lat = data.get("lat")
@@ -189,4 +207,5 @@ def location_weather():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Debug mode is for local use only; set FLASK_DEBUG=1 to turn it on
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1")
